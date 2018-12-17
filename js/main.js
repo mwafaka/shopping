@@ -1,28 +1,17 @@
 var cartContentArray = [];
 
 $(document).ready(() => {
-  function smoothScroll(target, duration) {
-    var target = document.querySelector(target);
-    var targetPosition = target.getBoundingClientRect().top;
-    var startPosition = window.pageYOffset;
-    var distance = targetPosition - startPosition;
-    var startTime = null;
+  //scrolling window
+  function smoothScroll(targetSelector, duration) {
+    var targetContainer = document.querySelector(targetSelector);
 
-    function animation(currentTime) {
-      if (startTime === null) startTime = currentTime;
-      var timeElapsed = currentTime - startTime;
-      var run = ease(timeElapsed, startPosition, distance, duration);
-      window.scrollTo(0, run);
-      if (timeElapsed < duration) requestAnimationFrame(animation);
-    }
+    var targetPosition = targetContainer.offsetTop;
 
-    function ease(t, b, c, d) {
-      t /= d / 2;
-      if (t < 1) return (c / 2) * t * t + b;
-      t--;
-      return (-c / 2) * (t * (t - 2) - 1) + b;
-    }
-    requestAnimationFrame(animation);
+    // console.log(targetSelector, targetContainer, targetPosition)
+    window.scrollTo({
+      top: targetPosition,
+      behavior: "smooth"
+    });
   }
   var scroll1 = document.querySelector(".scroll1");
   var scroll2 = document.querySelector(".scroll2");
@@ -40,7 +29,7 @@ $(document).ready(() => {
   scroll4.addEventListener("click", function() {
     smoothScroll("#acc", 1000);
   });
-  //////////////////////////////////////////////////////////////////////////////////////
+  //item Objects
   const items = [
     {
       id: 1,
@@ -127,6 +116,7 @@ $(document).ready(() => {
       title: "Summer Collection"
     }
   ];
+  //create DOM of the Objects
   items.map(item => {
     let itemObj = ` 
                   <div class="col-md-3 card-con mt-5">
@@ -134,23 +124,29 @@ $(document).ready(() => {
                       <img src="${item.imgUrl}" class="card-img-top" alt="">
                       <div class="card-body">
                           <h5>${item.type}</h5>
-                          <h5>${item.price}</h5>
+                          <h5 class="cart-price">$ ${item.price}</h5>
                           <button  id="${
                             item.id
-                          }"  class="add-to-cart btn pink btn-danger "><i class="fa fa-cart-plus" aria-hidden="true"></i> Add to
+                          }"  class="add-to-cart btn pink  "><i class="fa fa-cart-plus" aria-hidden="true"></i> Add to
                               Cart</button>
                       </div>
                 </div>`;
     $(".item-container").append(itemObj);
   });
+
+  //click event to ADD to CART
   $(".add-to-cart").on("click", function(e) {
     e.preventDefault();
     var id = e.target.id;
+    //console.log(id)
     let itemIndex = cartContentArray.findIndex(item => item.id == id);
+    //console.log(itemIndex)
     if (itemIndex !== -1) {
       cartContentArray[itemIndex].qty += 1;
-      cartContentArray[itemIndex].price += cartContentArray[itemIndex].price;
+      cartContentArray[itemIndex].price += items[id - 1].price;
+      //console.log("if ran")
     } else {
+      //console.log("else ran")
       items.forEach((item, i) => {
         if (item.id == id) {
           cartContentArray.push({
@@ -165,20 +161,20 @@ $(document).ready(() => {
       });
     }
     console.log(cartContentArray);
-    //****************************************************************************** */
+    //
     var cart = $("#cart-qty-id").html(cartContentArray.length);
 
-    var imgtodrag = $(this)
+    var imgToDrag = $(this)
       .parent()
       .parent(".card")
       .find("img")
       .eq(0);
-    if (imgtodrag) {
-      var imgclone = imgtodrag
+    if (imgToDrag) {
+      var imgClone = imgToDrag
         .clone()
         .offset({
-          top: imgtodrag.offset().top,
-          left: imgtodrag.offset().left
+          top: imgToDrag.offset().top,
+          left: imgToDrag.offset().left
         })
         .css({
           opacity: "0.5",
@@ -198,18 +194,18 @@ $(document).ready(() => {
           1000,
           "easeInOutExpo"
         );
-      imgclone.animate({
+      imgClone.animate({
         width: 0,
         height: 0
       });
     }
   });
 });
-////////////////////////////////////////////////////////
+//click event
 $("div").on("click", "#cartIcon", function() {
   generateCart();
 });
-
+//click event to remove item from the cart
 $(".cart").on("click", ".remove-item", function(e) {
   let id = e.target.id;
   let index = cartContentArray.findIndex(item => item.id == id);
@@ -217,7 +213,7 @@ $(".cart").on("click", ".remove-item", function(e) {
   cartContentArray.splice(index, 1);
   generateCart();
 });
-
+// create the cart
 function generateCart() {
   $(".cart").html("");
   if (cartContentArray.length == 0) {
@@ -235,7 +231,7 @@ function generateCart() {
           class="cart-image "
           src="${item.imgUrl}"/></td>
           <td>${item.type}</td>
-          <td>${item.price}</td>
+          <td>$${item.price}</td>
           <td>${item.qty}</td>
           <td> <i class="fas fa-trash-alt remove-item" />
           </td>
@@ -245,5 +241,95 @@ function generateCart() {
           </div>`;
       $(".cart").append(itemObj);
     });
+    //add total append
+    let totalDiv = "";
+    totalDiv = `<div> ${getTotal(cartContentArray)} </div>`;
+    $(".cart").append(totalDiv);
+  }
+  // TOTAL
+  function getTotal(cartContentArray) {
+    let total = 0;
+    //let prices = items.price;
+
+    cartContentArray.forEach(function(item) {
+      let priceNumber = item.price;
+      total += priceNumber;
+    });
+    return total;
+    //return total;
+    /*
+const totalPrice = total.reduce(function(total,items){
+  console.log(typeof((items.price)));
+  total += items.price ;
+   return total
+}, 0);
+console.log(totalPrice);*/
   }
 }
+//GET NEWS API
+
+function changePage() {
+  let url = `https://newsapi.org/v2/everything?q=fashion&apiKey=022b49c789a54234b5c034865f978dad`;
+
+  async function getUsers() {
+    let res = await fetch(url);
+    let data = await res.json();
+    //console.log('res.json', data);
+
+    let articles = data.articles;
+    let articlesToShow = Math.floor(Math.random() * articles.length - 6);
+    //console.log(articles.length + ' ' + articlesToShow);
+
+    articles = articles.slice(articlesToShow, articlesToShow + 6);
+    renderOutput(articles);
+  }
+  getUsers();
+
+  function renderOutput(data) {
+    data.forEach(item => {
+      //this is function of date after covert it from iso to normal date
+      // let newDate = new Date();
+      // let articleDate = new Date(item.publishedAt);
+      // let minsAgo = Math.round((newDate.getTime() - articleDate.getTime()) / (1000 * 60));
+      // let hoursAgo = Math.round(minsAgo / 60);
+
+      // let dateToShow = "";
+      // if (hoursAgo == 0) {
+      //   if (minsAgo == 1) {
+      //     dateToShow = minsAgo.toString() + " Minute Ago";
+      //   } else {
+      //     dateToShow = minsAgo.toString() + " Minutes Ago";
+      //   }
+
+      // } else {
+      //   if (hoursAgo == 1) {
+      //     dateToShow = hoursAgo.toString() + " Hour Ago";
+      //   } else {
+      //     dateToShow = hoursAgo.toString() + " Hours Ago";
+      //   }
+
+      // }
+
+      // console.log(minsAgo, hoursAgo);
+
+      let show = ` <div class="col-md-6">
+      <div class="media mt-5">
+          <img src="${item.urlToImage}" class="img-fluid mr-3" alt="">
+          <div class="media-body">
+            <a class="newsTitle" href="${item.url}" target="_blank"> <h3>${
+        item.title
+      }t</h3></a>
+              <p> ${item.description.slice(0, 100)}..</p>
+              <p><i class="fas fa-user-edit"></i> ${item.author}</p>
+              
+          </div>
+      </div>
+  </div>`;
+
+      // div += show;
+      document.getElementById("demo").innerHTML += show;
+    });
+  }
+}
+
+changePage();

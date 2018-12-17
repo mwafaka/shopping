@@ -1,5 +1,5 @@
 body {
-  background-color: #efe2bd;
+  background-color: #feeae6;
 }
 .bg-black {
   background-color: black;
@@ -38,19 +38,19 @@ body {
 .underline-green {
   width: 70px;
   height: 2px;
-  background-color: lawngreen;
+  background-color: black;
 }
 
 .underline-blue {
   width: 70px;
   height: 2px;
-  background-color: rgb(10, 12, 173);
+  background-color: black;
 }
 
 .underline-red {
   width: 70px;
   height: 2px;
-  background-color: rgb(236, 12, 12);
+  background-color: black;
 }
 
 .card-body {
@@ -67,14 +67,24 @@ body {
 }
 
 .pink {
-  background-color: #ffa2a2;
-  color: #501b1d;
+  background-color: #ce93d8;
+  color: white;
+}
+.pink:hover {
+  background-color: #ff9292;
 }
 
 h1 {
   font-size: 100px;
   font-weight: 700;
   font-family: "Unlock", cursive;
+}
+
+h2 {
+  color: rgb(255, 217, 247);
+  font-size: 55px;
+  font-weight: 700;
+  font-family: "Dancing Script", cursive;
 }
 
 .oneUse {
@@ -94,11 +104,13 @@ h1 {
 }
 
 .navbar {
-  background-color: #efe2bd;
+  background-color: rgb(255, 217, 247);
 }
 
-a {
+.nav-link {
   text-decoration: none;
+  font-family: "Dancing Script", cursive;
+  font-size: 25px;
 }
 .cart {
   float: right;
@@ -108,8 +120,17 @@ a {
   height: 90px;
 }
 .modal-content {
-  background-color: #ece8ba;
+  background-color: rgb(242, 170, 255);
 }
 .navbar-nav {
   cursor: pointer;
+}
+
+.newsTitle {
+  text-decoration: none !important;
+  color: brown;
+}
+
+.table {
+  background-color: #feeae6;
 }
